@@ -1,65 +1,181 @@
-import Image from "next/image";
+'use client';
+import { useState } from 'react';
+import { DayPicker } from 'react-day-picker';
+import { FaCalendarCheck, FaEye, FaPlus } from 'react-icons/fa';
+import {
+	FaArrowRightFromBracket,
+	FaCalendarDays,
+	FaCircleExclamation,
+} from 'react-icons/fa6';
+import 'react-day-picker/style.css';
+
+const stats = [
+	{
+		name: 'Kegiatan Hari Ini',
+		value: '1',
+		icon: <FaCalendarCheck />,
+		color: '#d9dcf2',
+		icon_color: '#272e6e',
+	},
+	{
+		name: 'Kegiatan Bulan Ini',
+		value: '27',
+		icon: <FaCalendarDays />,
+		color: '#fff1d6',
+		icon_color: '#272e6e',
+	},
+	{
+		name: 'Hari Belum Mengisi',
+		value: '2',
+		icon: <FaCircleExclamation />,
+		color: '#FEE2E2',
+		icon_color: '#e95d35',
+	},
+];
+
+const activitiesHistory = [
+	{
+		date: '6 Maret 2026',
+		name: 'Penyusunan RPP',
+		description:
+			'Menyusun rencana pelaksanaan pembelajaran (RPP) untuk mata pelajaran semester genap.',
+	},
+	{
+		date: '5 Maret 2026',
+		name: 'Mengajar Kelas VII',
+		description:
+			'Melaksanakan kegiatan pembelajaran di kelas VII sesuai dengan materi yang telah direncanakan.',
+	},
+	{
+		date: '4 Maret 2026',
+		name: 'Evaluasi Hasil Belajar',
+		description:
+			'Melakukan koreksi dan evaluasi terhadap hasil tugas dan ulangan siswa.',
+	},
+];
 
 export default function Home() {
-  return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
-  );
+	const [selected, setSelected] = useState();
+	return (
+		<div className='flex flex-col min-h-screen items-start  justify-start gap-8 w-full'>
+			<div className='py-4 bg-white rounded-2xl p-4 w-full bg-'>
+				<span className='font-black text-[32px]'>Dashboard</span>
+			</div>
+			<div className='w-full flex gap-8'>
+				{/* Left Side */}
+				<div className='w-full flex flex-col gap-8'>
+					{/* Stats */}
+					<div className='w-full flex items-center justify-between gap-8'>
+						{stats.map(s => (
+							<div
+								key={s.name}
+								style={{ backgroundColor: s.color }}
+								className={`rounded-2xl w-full px-8 py-4 flex items-center justify-start gap-4 text-[#0d1026]`}>
+								{/* <div
+									style={{ color: s.icon_color }}
+									className='p-4 flex items-center justify-center rounded-full text-white bg-gray-100 text-3xl'>
+									{s.icon}
+								</div> */}
+								<div className='flex flex-col'>
+									<span className='text-sm'>{s.name}</span>
+									<span className='font-bold text-[40px]'>
+										{s.value}
+									</span>
+								</div>
+							</div>
+						))}
+					</div>
+					{/* Activity Table */}
+					<div className='flex flex-col gap-4 rounded-2xl bg-white p-4 overflow-clip'>
+						<div className='w-full flex items-center justify-between'>
+							<span className='font-bold'>Kegiatan Hari Ini</span>
+							<button className='px-4 py-2 flex items-center gap-2 rounded-md bg-[#ffc65c]  text-sm'>
+								<FaPlus />
+								<span>Tambah Kegiatan</span>
+							</button>
+						</div>
+						<table className='w-full border-collapse'>
+							<thead>
+								<tr className='text-xs '>
+									<th className='text-left p-3'>
+										Nama Kegiatan
+									</th>
+									<th className='text-left p-3'>Deskripsi</th>
+									<th className='text-center p-3'>
+										Dokumentasi
+									</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr className=''>
+									<td className='p-3'>
+										Rapat Koordinasi Guru
+									</td>
+									<td className='p-3'>
+										Mengikuti rapat koordinasi bersama
+										kepala sekolah dan guru untuk membahas
+										program kegiatan sekolah dan evaluasi
+										pembelajaran.
+									</td>
+									<td className='text-center p-3 text-[#272e6e]'>
+										<FaEye />
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<div className='flex flex-col gap-4 '>
+						<div className='w-full flex items-center justify-start'>
+							<span className='font-bold'>Riwayat Kegiatan</span>
+						</div>
+						<div className='flex flex-col gap-4 font-medium'>
+							{activitiesHistory.map(a => (
+								<div
+									key={a.name}
+									className='rounded-xl bg-[#d9dcf2] p-4 flex gap-8'>
+									<div className='h-full aspect-square bg-gray-500 rounded-md'></div>
+									<div className='flex flex-col'>
+										<span className='flex items-center font-extrabold'>
+											{a.name}
+										</span>
+										<span className='flex items-center text-xs'>
+											{a.date}
+										</span>
+										<span className='col-span-3'>
+											{a.description}
+										</span>
+										<div className='mt-4 flex gap-4 items-center'>
+											<span className='underline font-light'>
+												Lihat Detail
+											</span>
+											<FaArrowRightFromBracket />
+										</div>
+									</div>
+								</div>
+							))}
+						</div>
+					</div>
+				</div>
+				{/* Right Side */}
+				<div className='min-w-66.5 flex flex-col gap-8 w-66.5'>
+					<div className='flex flex-col w-full h-fit bg-white rounded-2xl items-center justify-center gap-4 py-6'>
+						<div className='bg-gray-300 size-25 rounded-full'></div>
+						<div className='flex flex-col items-center justify-center'>
+							<span className='font-bold text-[20px] '>
+								Suliono Albiantoro
+							</span>
+							<span className='text-sm'>
+								{' '}
+								19900315 201802 1 001
+							</span>
+						</div>
+						<span className='font-medium '>Pengajar</span>
+					</div>
+					<div className='bg-white rounded-2xl p-4 w-full'>
+						<DayPicker className='w-full' />
+					</div>
+				</div>
+			</div>
+		</div>
+	);
 }
