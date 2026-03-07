@@ -3,6 +3,8 @@ import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import Link from "next/link";
+import Image from 'next/image';
+import logo from '../../public/logo-notes-smangad-alt.png';
 
 export default function LoginPage() {
     const router = useRouter();
@@ -29,9 +31,23 @@ export default function LoginPage() {
     };
 
     return (
-        <div className="flex h-[80vh] items-center justify-center">
-            <form onSubmit={handleLogin} className="bg-white p-8 rounded-2xl shadow-xl w-96 flex flex-col gap-4">
-                <h1 className="text-2xl font-black text-[#262e6d] text-center">Notes Smangad</h1>
+        <div className="absolute inset-0 flex items-center justify-center bg-[#262e6d] overflow-hidden">
+            
+            <div 
+                className="absolute inset-0 z-0 opacity-10"
+                style={{
+                    backgroundImage: `
+                        linear-gradient(#ffc65c 1px, transparent 2px),
+                        linear-gradient(90deg, #ffc65c 1px, transparent 2px)
+                    `,
+                    backgroundSize: '40px 40px', 
+                    backgroundPosition: 'center center'
+                }}
+            ></div>
+
+            <form onSubmit={handleLogin} className="relative z-10 bg-white p-8 rounded-2xl shadow-xl w-96 flex flex-col gap-4 border border-white/20">
+                <Image src={logo} alt='Logo Notes Smangad' priority className="mx-auto" />
+                
                 {error && <p className="text-red-500 text-sm text-center font-bold">{error}</p>}
                 
                 <input name="email" type="email" placeholder="Email" className="p-3 border rounded-xl outline-none focus:ring-2 focus:ring-[#262e6d]" required />
