@@ -13,3 +13,12 @@ model User {
   name      String?
   createdAt DateTime @default(now())
 }
+
+model Journal {
+  id          Int      @id @default(autoincrement())
+  tanggal     DateTime
+  nama        String
+  deskripsi   String
+  imageUrl    String?  
+  createdAt   DateTime @default(now())
+}
