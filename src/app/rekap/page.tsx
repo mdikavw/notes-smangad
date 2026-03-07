@@ -3,47 +3,56 @@
 import Image from "next/image";
 import logo from "../../../public/logo-sekolah.png";
 import { FaPrint, FaCalendarAlt, FaChevronLeft, FaChevronRight } from "react-icons/fa"; 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { getJurnalByBulan } from "@/app/actions/rekap";
+import { useSession } from "next-auth/react";
 
 export default function RekapPage() {
-    const [selectedMonth, setSelectedMonth] = useState("2026-03");
+    // Mengambil data user yang sedang login (Nama & Email Asli)
+    const { data: session } = useSession();
+    
+    // Set default ke bulan saat ini (misal: "2026-03")
+    const [selectedMonth, setSelectedMonth] = useState(() => {
+        const now = new Date();
+        return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+    });
 
-    const dummyData = [
-        {
-            id: 1,
-            rawDate: "2026-03-07", 
-            tanggal: "07 Maret 2026",
-            nama: "Mengajar Kelas 10A - Matematika Lanjut",
-            deskripsi: "Memberikan materi tentang matriks dan melakukan evaluasi harian. Siswa sangat antusias, namun ada 2 siswa yang perlu bimbingan tambahan.",
-            imageUrl: "https://images.unsplash.com/photo-1577896851231-70ef18881754?q=80&w=800&auto=format&fit=crop", 
-        },
-        {
-            id: 2,
-            rawDate: "2026-03-08",
-            tanggal: "08 Maret 2026",
-            nama: "Rapat Kordinasi Guru MIPA",
-            deskripsi: "Membahas persiapan ujian tengah semester dan penyusunan kisi-kisi soal yang akan diunggah ke e-learning sekolah.",
-            imageUrl: null, 
-        },
-        {
-            id: 3,
-            rawDate: "2026-04-12", 
-            tanggal: "12 April 2026",
-            nama: "Pengawas Ujian Tengah Semester",
-            deskripsi: "Menjadi pengawas ruangan 05 untuk ujian mata pelajaran Bahasa Indonesia dan Sejarah.",
-            imageUrl: null, 
-        }
-    ];
+    const [dbData, setDbData] = useState<any[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
 
-    const filteredData = dummyData.filter(kegiatan => 
-        kegiatan.rawDate.startsWith(selectedMonth)
-    );
+    // Ambil data dari MariaDB setiap kali selectedMonth berubah
+    useEffect(() => {
+        const fetchDbData = async () => {
+            setIsLoading(true);
+            const result = await getJurnalByBulan(selectedMonth);
+            
+            if (result.success && result.data) {
+                setDbData(result.data);
+            } else {
+                setDbData([]);
+            }
+            setIsLoading(false);
+        };
 
+        fetchDbData();
+    }, [selectedMonth]);
+
+    // Format YYYY-MM ke Teks Bulan (Kop PDF)
     const getFormattedMonth = (yyyymm: string) => {
         if (!yyyymm) return "-";
         const [year, month] = yyyymm.split("-");
         const months = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
         return `${months[parseInt(month) - 1]} ${year}`;
+    };
+
+    // Format Date DB ke Teks (Isi Jurnal) -> Contoh: "07 Maret 2026"
+    const formatTanggal = (dateString: string | Date) => {
+        const date = new Date(dateString);
+        const day = String(date.getDate()).padStart(2, '0');
+        const months = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+        const month = months[date.getMonth()];
+        const year = date.getFullYear();
+        return `${day} ${month} ${year}`;
     };
 
     const handlePrint = () => {
@@ -74,19 +83,13 @@ export default function RekapPage() {
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6 print:hidden bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
                 <div>
                     <h1 className="text-2xl font-black text-[#262e6d]">Rekap Bulanan</h1>
-                    {/* Teks ini penanda bahwa kodenya sudah versi terbaru */}
                     <p className="text-slate-500 text-sm mt-1">Pilih bulan dan pratinjau laporan sebelum dicetak.</p>
                 </div>
                 
                 <div className="flex flex-wrap items-center gap-3">
                     
                     <div className="flex items-center gap-1 bg-slate-50 border-2 border-slate-100 rounded-xl p-1 focus-within:border-[#ffc65c] focus-within:ring-4 focus-within:ring-[#ffc65c]/20 transition-all">
-                        
-                        <button 
-                            onClick={() => handleMonthChange(-1)}
-                            className="p-2 text-slate-400 hover:text-[#262e6d] hover:bg-slate-200 rounded-lg transition-colors"
-                            title="Bulan Sebelumnya"
-                        >
+                        <button onClick={() => handleMonthChange(-1)} className="p-2 text-slate-400 hover:text-[#262e6d] hover:bg-slate-200 rounded-lg transition-colors">
                             <FaChevronLeft />
                         </button>
 
@@ -100,22 +103,18 @@ export default function RekapPage() {
                             />
                         </div>
 
-                        <button 
-                            onClick={() => handleMonthChange(1)}
-                            className="p-2 text-slate-400 hover:text-[#262e6d] hover:bg-slate-200 rounded-lg transition-colors"
-                            title="Bulan Berikutnya"
-                        >
+                        <button onClick={() => handleMonthChange(1)} className="p-2 text-slate-400 hover:text-[#262e6d] hover:bg-slate-200 rounded-lg transition-colors">
                             <FaChevronRight />
                         </button>
                     </div>
 
                     <button 
                         onClick={handlePrint}
-                        disabled={filteredData.length === 0}
+                        disabled={dbData.length === 0 || isLoading}
                         className="flex items-center gap-2 bg-[#ffc65c] text-[#262e6d] px-6 py-3 rounded-xl font-bold hover:bg-[#ffb52e] hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         <FaPrint />
-                        <span>Cetak PDF</span>
+                        <span>{isLoading ? 'Memuat...' : 'Cetak PDF'}</span>
                     </button>
                 </div>
             </div>
@@ -157,12 +156,12 @@ export default function RekapPage() {
                             <tr>
                                 <td className="py-0.5 w-40">Nama Lengkap</td>
                                 <td className="py-0.5 w-4">:</td>
-                                <td className="py-0.5">Elang Rama (Dummy)</td>
+                                <td className="py-0.5 font-bold uppercase">{session?.user?.name || "Nama Belum Diatur"}</td>
                             </tr>
                             <tr>
                                 <td className="py-0.5">Email / NIP</td>
                                 <td className="py-0.5">:</td>
-                                <td className="py-0.5">admin@smangad.com</td>
+                                <td className="py-0.5">{session?.user?.email || "Email Belum Diatur"}</td>
                             </tr>
                             <tr>
                                 <td className="py-0.5">Jabatan</td>
@@ -174,18 +173,22 @@ export default function RekapPage() {
                 </div>
 
                 <div className="flex flex-col gap-6 text-[12pt]">
-                    {filteredData.length === 0 ? (
+                    {isLoading ? (
+                         <div className="text-center py-10 print:hidden">
+                            <p className="text-slate-500 font-bold animate-pulse">⏳ Mengambil data dari MariaDB...</p>
+                        </div>
+                    ) : dbData.length === 0 ? (
                         <div className="text-center py-10 border-2 border-dashed border-slate-300 rounded-xl print:border-none">
                             <p className="text-slate-500 italic">Tidak ada catatan kegiatan pada bulan {getFormattedMonth(selectedMonth)}.</p>
                         </div>
                     ) : (
-                        filteredData.map((kegiatan, index) => (
+                        dbData.map((kegiatan, index) => (
                             <div 
                                 key={kegiatan.id} 
                                 className="print:break-inside-avoid"
                             >
                                 <p className="font-bold">
-                                    {index + 1}. {kegiatan.nama} <span className="font-normal">({kegiatan.tanggal})</span>
+                                    {index + 1}. {kegiatan.nama} <span className="font-normal">({formatTanggal(kegiatan.tanggal)})</span>
                                 </p>
                                 <p className="text-justify mt-1 pl-4">
                                     {kegiatan.deskripsi}
@@ -205,7 +208,7 @@ export default function RekapPage() {
                     )}
                 </div>
 
-                {filteredData.length > 0 && (
+                {(!isLoading && dbData.length > 0) && (
                     <div className="mt-16 flex justify-end print:break-inside-avoid text-[12pt]">
                         <div className="text-center w-64">
                             <p>Mengetahui,</p>
