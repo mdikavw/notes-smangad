@@ -33,7 +33,6 @@ export default function Sidebar() {
 			<div className='w-full flex items-center justify-center px-6 mb-4'>
 				<Image src={logo} alt='Logo Notes Smangad' priority />
 			</div>
-
 			<div className='flex flex-col w-full gap-2 px-4'>
 				{menus.map(m => {
 					const isActive = pathname === m.link;

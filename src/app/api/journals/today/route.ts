@@ -1,16 +1,31 @@
-import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-
+import { getServerSession } from 'next-auth/next';
+import { authOptions } from '../../auth/[...nextauth]/route';
 export async function GET() {
 	try {
+		const session = await getServerSession(authOptions);
+		if (!session?.user?.email) {
+			return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+				status: 401,
+			});
+		}
+
+		const user = await prisma.user.findUnique({
+			where: { email: session.user.email },
+			select: { id: true },
+		});
+
+		if (!user) {
+			return new Response(JSON.stringify({ error: 'User not found' }), {
+				status: 404,
+			});
+		}
+
 		const today = new Date();
 		const startOfDay = new Date(
 			today.getFullYear(),
 			today.getMonth(),
 			today.getDate(),
-			0,
-			0,
-			0,
 		);
 		const endOfDay = new Date(
 			today.getFullYear(),
@@ -23,17 +38,17 @@ export async function GET() {
 
 		const journalsToday = await prisma.journal.findMany({
 			where: {
-				tanggal: {
-					gte: startOfDay,
-					lte: endOfDay,
-				},
+				userId: user.id,
+				tanggal: { gte: startOfDay, lte: endOfDay },
 			},
 			orderBy: { tanggal: 'asc' },
 		});
 
-		return NextResponse.json(journalsToday);
+		return new Response(JSON.stringify(journalsToday), { status: 200 });
 	} catch (error) {
-		console.error('Error fetching today journals:', error);
-		return NextResponse.json({ error: 'Server error' }, { status: 500 });
+		console.error(error);
+		return new Response(JSON.stringify({ error: 'Server error' }), {
+			status: 500,
+		});
 	}
 }

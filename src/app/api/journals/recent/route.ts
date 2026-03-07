@@ -1,30 +1,45 @@
-import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { getServerSession } from 'next-auth/next';
+import { authOptions } from '../../auth/[...nextauth]/route';
 
 export async function GET() {
 	try {
+		const session = await getServerSession(authOptions);
+		if (!session?.user?.email) {
+			return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+				status: 401,
+			});
+		}
+
+		const user = await prisma.user.findUnique({
+			where: { email: session.user.email },
+			select: { id: true },
+		});
+
+		if (!user) {
+			return new Response(JSON.stringify({ error: 'User not found' }), {
+				status: 404,
+			});
+		}
+
 		const today = new Date();
 		const startOfDay = new Date(
 			today.getFullYear(),
 			today.getMonth(),
 			today.getDate(),
-			0,
-			0,
-			0,
 		);
 
-		// 5 kegiatan terakhir sebelum hari ini
 		const recentJournals = await prisma.journal.findMany({
-			where: {
-				tanggal: { lt: startOfDay },
-			},
+			where: { userId: user.id, tanggal: { lt: startOfDay } },
 			orderBy: { tanggal: 'desc' },
-			take: 3,
+			take: 5,
 		});
 
-		return NextResponse.json(recentJournals);
+		return new Response(JSON.stringify(recentJournals), { status: 200 });
 	} catch (error) {
-		console.error('Error fetching recent journals:', error);
-		return NextResponse.json({ error: 'Server error' }, { status: 500 });
+		console.error(error);
+		return new Response(JSON.stringify({ error: 'Server error' }), {
+			status: 500,
+		});
 	}
 }
