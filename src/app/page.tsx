@@ -42,7 +42,7 @@ export default function LoginPage() {
                 </button>
                 
                 <p className="text-xs text-center text-gray-500">
-                    Belum punya akun? <Link href="/" className="text-blue-600 font-bold hover:underline">Daftar disini</Link>
+                    Belum punya akun? <Link href="/register" className="text-blue-600 font-bold hover:underline">Daftar disini</Link>
                 </p>
             </form>
         </div>
