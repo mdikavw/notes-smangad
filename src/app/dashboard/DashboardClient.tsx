@@ -8,6 +8,7 @@ import {
 	FaCircleExclamation,
 } from 'react-icons/fa6';
 import 'react-day-picker/style.css';
+import { PopupTambahKegiatan } from '@/components/InputPopup';
 
 // 1. Definisikan interface props agar tidak error di page.tsx
 interface DashboardClientProps {
@@ -68,6 +69,7 @@ const activitiesHistory = [
 // 2. Ubah nama fungsi menjadi DashboardClient dan terima props userEmail
 export default function DashboardClient({ userEmail }: DashboardClientProps) {
 	const [selected, setSelected] = useState<Date | undefined>();
+	const [isPopupOpen, setIsPopupOpen] = useState(false);
 
 	return (
 		<div className='flex flex-col min-h-screen items-start justify-start gap-8 w-full'>
@@ -105,7 +107,11 @@ export default function DashboardClient({ userEmail }: DashboardClientProps) {
 					<div className='flex flex-col gap-4 rounded-2xl bg-white p-4 overflow-clip'>
 						<div className='w-full flex items-center justify-between'>
 							<span className='font-bold'>Kegiatan Hari Ini</span>
-							<button className='px-4 py-2 flex items-center gap-2 rounded-md bg-[#ffc65c] text-sm font-bold'>
+							<button
+								onClick={() => {
+									setIsPopupOpen(true);
+								}}
+								className='px-4 py-2 flex items-center gap-2 rounded-md bg-[#ffc65c] text-sm font-bold'>
 								<FaPlus />
 								<span>Tambah Kegiatan</span>
 							</button>
@@ -200,6 +206,10 @@ export default function DashboardClient({ userEmail }: DashboardClientProps) {
 					</div>
 				</div>
 			</div>
+			<PopupTambahKegiatan
+				isOpen={isPopupOpen}
+				onClose={() => setIsPopupOpen(false)}
+			/>
 		</div>
 	);
 }

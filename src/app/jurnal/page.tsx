@@ -1,6 +1,7 @@
 'use client';
 import { FaEye, FaPlus } from 'react-icons/fa';
 import { useState } from 'react';
+import { PopupTambahKegiatan } from '@/components/InputPopup';
 
 interface JournalEntry {
 	tanggal: string;
@@ -71,6 +72,7 @@ const journalEntries: JournalEntry[] = [
 
 export default function Jurnal() {
 	const [entries, setEntries] = useState<JournalEntry[]>(journalEntries);
+	const [isPopupOpen, setIsPopupOpen] = useState(false);
 
 	return (
 		<div className='flex flex-col min-h-screen gap-8 p-4'>
@@ -83,8 +85,12 @@ export default function Jurnal() {
 			<div className='flex flex-col bg-white rounded-2xl p-4 overflow-x-auto'>
 				<div className='flex items-center justify-between mb-4'>
 					<span className='font-bold text-lg'>Daftar Jurnal</span>
-					<button className='px-4 py-2 flex items-center gap-2 rounded-md bg-[#ffc65c] text-sm font-bold'>
-						<FaPlus /> Tambah Jurnal
+					<button
+						onClick={() => {
+							setIsPopupOpen(true);
+						}}
+						className='px-4 py-2 flex items-center gap-2 rounded-md bg-[#ffc65c] text-sm font-bold'>
+						<FaPlus /> Tambah Kegiatan
 					</button>
 				</div>
 
@@ -119,6 +125,10 @@ export default function Jurnal() {
 					</tbody>
 				</table>
 			</div>
+			<PopupTambahKegiatan
+				isOpen={isPopupOpen}
+				onClose={() => setIsPopupOpen(false)}
+			/>
 		</div>
 	);
 }
