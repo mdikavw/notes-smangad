@@ -2,6 +2,7 @@
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import Link from "next/link";
 
 export default function LoginPage() {
     const router = useRouter();
@@ -41,7 +42,7 @@ export default function LoginPage() {
                 </button>
                 
                 <p className="text-xs text-center text-gray-500">
-                    Belum punya akun? Hubungi Admin Sekolah.
+                    Belum punya akun? <Link href="/" className="text-blue-600 font-bold hover:underline">Daftar disini</Link>
                 </p>
             </form>
         </div>
