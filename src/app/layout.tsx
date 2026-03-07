@@ -17,7 +17,6 @@ export const metadata: Metadata = {
     description: 'Aplikasi pencatatan dengan sistem autentikasi',
 };
 
-
 export default async function RootLayout({
     children,
 }: Readonly<{
@@ -28,23 +27,22 @@ export default async function RootLayout({
 
     return (
         <html lang="id">
-            <body className={`${nunito.className} flex w-full min-h-screen bg-[#262e6d]`}>
+            <body className={`${nunito.className} flex w-full min-h-screen bg-[#262e6d] print:bg-white`}>
                 <Providers>
                
                     {session && (
-                        <div className='fixed left-0 h-screen'>
+                        <div className='fixed left-0 h-screen print:hidden'>
                             <Sidebar />
                         </div>
                     )}
                     
-        
                     <div 
                         className={`
                             ${session 
-                                ? 'ms-70 p-6 bg-[#eeeef9] rounded-s-3xl' 
+                                ? 'ms-70 p-6 bg-[#eeeef9] rounded-s-3xl print:ms-0 print:p-0 print:bg-white print:rounded-none' 
                                 : 'flex items-center justify-center w-full' 
                             } 
-                            w-full text-[#3e3e3e] min-h-screen h-fit
+                            w-full text-[#3e3e3e] min-h-screen h-fit print:min-h-0 print:block
                         `}
                     >
                         {children}
