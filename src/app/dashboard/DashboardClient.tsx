@@ -73,10 +73,9 @@ export default function DashboardClient({ userEmail, userName }: DashboardClient
 						value: statsRes.hariBelumMengisi.toString(),
 						color: '#ee8264',
 						icon: <FaCircleExclamation />,
-						text_color: '#272e6e',
+						text_color: '#ffffff',
 					},
 				]);
-
 				setKegiatanHariIni(todayRes);
 				setRiwayatKegiatan(recentRes);
 			} catch (error) {
@@ -145,20 +144,33 @@ export default function DashboardClient({ userEmail, userName }: DashboardClient
 								</tr>
 							</thead>
 							<tbody>
-								<tr className='border-t border-slate-50'>
-									<td className='p-3 font-medium'>
-										Rapat Koordinasi Guru
-									</td>
-									<td className='p-3 text-sm text-slate-600'>
-										Mengikuti rapat koordinasi bersama
-										kepala sekolah dan guru.
-									</td>
-									<td className='text-center p-3 text-[#272e6e]'>
-										<button className='hover:text-blue-500 transition'>
-											<FaEye />
-										</button>
-									</td>
-								</tr>
+								{kegiatanHariIni.length > 0 ? (
+									kegiatanHariIni.map(entry => (
+										<tr
+											key={entry.id}
+											className='border-t border-slate-50'>
+											<td className='p-3 font-medium text-[#272e6e]'>
+												{entry.nama}
+											</td>
+											<td className='p-3 text-slate-600'>
+												{entry.deskripsi}
+											</td>
+											<td className='text-center p-3 text-[#272e6e]'>
+												<button className='hover:text-blue-500 transition'>
+													<FaEye />
+												</button>
+											</td>
+										</tr>
+									))
+								) : (
+									<tr className='border-t border-slate-50'>
+										<td
+											colSpan={3}
+											className='text-center p-4 text-slate-400'>
+											Belum ada kegiatan hari ini
+										</td>
+									</tr>
+								)}
 							</tbody>
 						</table>
 					</div>
@@ -208,38 +220,44 @@ export default function DashboardClient({ userEmail, userName }: DashboardClient
 							<span className='font-bold'>Riwayat Kegiatan</span>
 						</div>
 						<div className='flex flex-col gap-4 font-medium'>
-							{riwayatKegiatan.map(a => (
-								<div
-									key={a.nama}
-									className='rounded-xl bg-white p-4 flex gap-8'>
-									<div className='h-full aspect-square bg-slate-400 rounded-md w-24'></div>
-									<div className='flex flex-col'>
-										<span className='flex items-center font-extrabold text-[#272e6e]'>
-											{a.nama}
-										</span>
-										<span className='flex items-center text-xs opacity-70'>
-											{new Date(
-												a.tanggal,
-											).toLocaleDateString('id-ID', {
-												day: 'numeric',
-												month: 'long',
-												year: 'numeric',
-											})}
-										</span>
-										<span className='mt-1 text-sm'>
-											{a.deskripsi}
-										</span>
-										<div className='mt-4 flex gap-4 items-center cursor-pointer hover:translate-x-1 transition-transform'>
-											<span className='underline font-light text-xs'>
-												Lihat Detail
+							{riwayatKegiatan.length > 0 ? (
+								riwayatKegiatan.map(a => (
+									<div
+										key={a.nama}
+										className='rounded-xl bg-white p-4 flex gap-8'>
+										<div className='h-full aspect-square bg-slate-400 rounded-md w-24'></div>
+										<div className='flex flex-col'>
+											<span className='flex items-center font-extrabold text-[#272e6e]'>
+												{a.nama}
 											</span>
-											<FaArrowRightFromBracket
-												size={12}
-											/>
+											<span className='flex items-center text-xs opacity-70'>
+												{new Date(
+													a.tanggal,
+												).toLocaleDateString('id-ID', {
+													day: 'numeric',
+													month: 'long',
+													year: 'numeric',
+												})}
+											</span>
+											<span className='mt-1 text-sm'>
+												{a.deskripsi}
+											</span>
+											<div className='mt-4 flex gap-4 items-center cursor-pointer hover:translate-x-1 transition-transform'>
+												<span className='underline font-light text-xs'>
+													Lihat Detail
+												</span>
+												<FaArrowRightFromBracket
+													size={12}
+												/>
+											</div>
 										</div>
 									</div>
-								</div>
-							))}
+								))
+							) : (
+								<span className='text-center p-4 text-slate-400'>
+									Belum ada kegiatan
+								</span>
+							)}
 						</div>
 					</div>
 				</div>
