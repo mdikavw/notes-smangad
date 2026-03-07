@@ -1,5 +1,5 @@
 'use client';
-import { FaEye, FaPlus } from 'react-icons/fa';
+import { FaEye, FaPlus, FaTrashAlt } from 'react-icons/fa';
 import { useEffect, useState } from 'react';
 import { PopupTambahKegiatan } from '@/components/InputPopup';
 
@@ -22,6 +22,26 @@ export default function Jurnal() {
 			.then(res => res.json())
 			.then(setJournals);
 	}, []);
+
+	const handleDelete = async (id: number) => {
+		if (!confirm('Apakah Anda yakin ingin menghapus jurnal ini?')) return;
+
+		try {
+			const res = await fetch(`/api/journals/${id}`, {
+				method: 'DELETE',
+			});
+
+			if (!res.ok) {
+				throw new Error('Gagal menghapus jurnal');
+			}
+
+			// Update state setelah berhasil delete
+			setJournals(prev => prev.filter(j => j.id !== id));
+		} catch (error) {
+			console.error(error);
+			alert('Terjadi kesalahan saat menghapus jurnal.');
+		}
+	};
 
 	return (
 		<div className='flex flex-col min-h-screen gap-8'>
@@ -50,37 +70,56 @@ export default function Jurnal() {
 							<th className='text-left p-3'>Nama</th>
 							<th className='text-left p-3'>Deskripsi</th>
 							<th className='text-center p-3'>Lihat Detail</th>
+							<th className='text-center p-3'>Aksi</th>
 						</tr>
 					</thead>
 					<tbody>
-						{journals.map((entry, idx) => (
-							<tr
-								key={idx}
-								className='border-t border-gray-200 hover:bg-gray-50 transition'>
-								<td className='p-3'>
-									{' '}
-									{new Date(entry.tanggal).toLocaleDateString(
-										'id-ID',
-										{
+						{journals.length > 0 ? (
+							journals.map((entry, idx) => (
+								<tr
+									key={idx}
+									className='border-t border-gray-200 hover:bg-gray-50 transition'>
+									<td className='p-3'>
+										{' '}
+										{new Date(
+											entry.tanggal,
+										).toLocaleDateString('id-ID', {
 											day: 'numeric',
 											month: 'long',
 											year: 'numeric',
-										},
-									)}
-								</td>
-								<td className='p-3 font-medium text-[#272e6e]'>
-									{entry.nama}
-								</td>
-								<td className='p-3 text-slate-600'>
-									{entry.deskripsi}
-								</td>
-								<td className='text-center p-3'>
-									<button className='text-[#272e6e] hover:text-blue-500 transition'>
-										<FaEye />
-									</button>
+										})}
+									</td>
+									<td className='p-3 font-medium text-[#272e6e]'>
+										{entry.nama}
+									</td>
+									<td className='p-3 text-slate-600'>
+										{entry.deskripsi}
+									</td>
+									<td className='text-center p-3'>
+										<button className='text-[#272e6e] hover:text-blue-500 transition'>
+											<FaEye />
+										</button>
+									</td>
+									<td className='text-center p-3'>
+										<button
+											onClick={() => {
+												handleDelete(entry.id);
+											}}
+											className='text-white bg-red-500 cursor-pointer px-4 py-2  rounded-md'>
+											<FaTrashAlt />
+										</button>
+									</td>
+								</tr>
+							))
+						) : (
+							<tr>
+								<td
+									colSpan={5}
+									className='text-center p-4 text-slate-400'>
+									Belum ada kegiatan
 								</td>
 							</tr>
-						))}
+						)}
 					</tbody>
 				</table>
 			</div>
