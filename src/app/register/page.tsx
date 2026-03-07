@@ -47,8 +47,33 @@ export default function RegisterPage() {
                 
                 {error && <p className="text-red-500 text-sm text-center font-bold bg-red-50 p-2 rounded">{error}</p>}
                 
-                <input name="email" type="email" placeholder="Email (misal: guru@smangad.com)" className="p-3 border rounded-xl outline-none focus:ring-2 focus:ring-[#262e6d] bg-slate-50" required />
-                <input name="password" type="password" placeholder="Password (min. 6 karakter)" className="p-3 border rounded-xl outline-none focus:ring-2 focus:ring-[#262e6d] bg-slate-50" required minLength={6} />
+                {/* Kolom Input Nama Lengkap */}
+                <input 
+                    name="name" 
+                    type="text" 
+                    placeholder="Nama Lengkap (misal: Elang Rama)" 
+                    className="p-3 border rounded-xl outline-none focus:ring-2 focus:ring-[#262e6d] bg-slate-50" 
+                    required 
+                />
+
+                {/* Kolom Input Email */}
+                <input 
+                    name="email" 
+                    type="email" 
+                    placeholder="Email (misal: guru@smangad.com)" 
+                    className="p-3 border rounded-xl outline-none focus:ring-2 focus:ring-[#262e6d] bg-slate-50" 
+                    required 
+                />
+
+                {/* Kolom Input Password */}
+                <input 
+                    name="password" 
+                    type="password" 
+                    placeholder="Password (min. 6 karakter)" 
+                    className="p-3 border rounded-xl outline-none focus:ring-2 focus:ring-[#262e6d] bg-slate-50" 
+                    required 
+                    minLength={6} 
+                />
                 
                 <button type="submit" disabled={loading} className="bg-[#262e6d] text-white font-bold py-3 rounded-xl hover:bg-[#1a2150] transition disabled:opacity-50 mt-2">
                     {loading ? "Menyimpan..." : "Daftar Sekarang"}
