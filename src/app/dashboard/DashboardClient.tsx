@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { JSX, useEffect, useState } from 'react';
 import { DayPicker } from 'react-day-picker';
 import { FaBriefcase, FaCalendarCheck, FaEye, FaPlus } from 'react-icons/fa';
 import {
@@ -15,61 +15,73 @@ interface DashboardClientProps {
 	userEmail?: string | null;
 }
 
-const stats = [
-	{
-		name: 'Kegiatan Hari Ini',
-		value: '1',
-		icon: <FaBriefcase />,
-		color: '#3d48ac',
-		icon_color: '#272e6e',
-		text_color: '#ffffff',
-		icon_base_color: '',
-	},
-	{
-		name: 'Kegiatan Bulan Ini',
-		value: '27',
-		icon: <FaCalendarCheck />,
-		color: '#ffd382',
-		icon_color: '#272e6e',
-		text_color: '#272e6e',
-		icon_base_color: '',
-	},
-	{
-		name: 'Hari Belum Mengisi',
-		value: '2',
-		icon: <FaCircleExclamation />,
-		color: '#ee8264',
-		icon_color: '#e95d35',
-		text_color: '#272e6e',
-		icon_base_color: '',
-	},
-];
+interface Journal {
+	id: number;
+	tanggal: string;
+	nama: string;
+	deskripsi: string;
+	imageUrl?: string;
+}
 
-const activitiesHistory = [
-	{
-		date: '6 Maret 2026',
-		name: 'Penyusunan RPP',
-		description:
-			'Menyusun rencana pelaksanaan pembelajaran (RPP) untuk mata pelajaran semester genap.',
-	},
-	{
-		date: '5 Maret 2026',
-		name: 'Mengajar Kelas VII',
-		description:
-			'Melaksanakan kegiatan pembelajaran di kelas VII sesuai dengan materi yang telah direncanakan.',
-	},
-	{
-		date: '4 Maret 2026',
-		name: 'Evaluasi Hasil Belajar',
-		description:
-			'Melakukan koreksi dan evaluasi terhadap hasil tugas dan ulangan siswa.',
-	},
-];
+interface Stat {
+	name: string;
+	value: string;
+	color: string;
+	icon: JSX.Element;
+	text_color: string;
+}
 
 // 2. Ubah nama fungsi menjadi DashboardClient dan terima props userEmail
 export default function DashboardClient({ userEmail }: DashboardClientProps) {
 	const [selected, setSelected] = useState<Date | undefined>();
 	const [isPopupOpen, setIsPopupOpen] = useState(false);
+
+	const [stats, setStats] = useState<Stat[]>([]);
+	const [kegiatanHariIni, setKegiatanHariIni] = useState<Journal[]>([]);
+	const [riwayatKegiatan, setRiwayatKegiatan] = useState<Journal[]>([]);
+
+	useEffect(() => {
+		async function fetchData() {
+			try {
+				const [statsRes, todayRes, recentRes] = await Promise.all([
+					fetch('/api/journals/stats').then(res => res.json()),
+					fetch('/api/journals/today').then(res => res.json()),
+					fetch('/api/journals/recent').then(res => res.json()),
+				]);
+
+				setStats([
+					{
+						name: 'Kegiatan Hari Ini',
+						value: statsRes.kegiatanHariIni.toString(),
+						color: '#3d48ac',
+						icon: <FaBriefcase />,
+						text_color: '#fff',
+					},
+					{
+						name: 'Kegiatan Bulan Ini',
+						value: statsRes.kegiatanBulanIni.toString(),
+						color: '#ffd382',
+						icon: <FaCalendarCheck />,
+						text_color: '#272e6e',
+					},
+					{
+						name: 'Hari Belum Mengisi',
+						value: statsRes.hariBelumMengisi.toString(),
+						color: '#ee8264',
+						icon: <FaCircleExclamation />,
+						text_color: '#272e6e',
+					},
+				]);
+
+				setKegiatanHariIni(todayRes);
+				setRiwayatKegiatan(recentRes);
+			} catch (error) {
+				console.error('Fetch error:', error);
+			}
+		}
+
+		fetchData();
+	}, []);
 
 	return (
 		<div className='flex flex-col min-h-screen items-start justify-start gap-8 w-full'>
@@ -87,7 +99,7 @@ export default function DashboardClient({ userEmail }: DashboardClientProps) {
 								className={`rounded-2xl bg-white w-full px-4 py-4 flex items-center justify-between gap-4 text-[#0d1026]`}>
 								<div className='flex flex-col ps-4'>
 									<span className='text-sm'>{s.name}</span>
-									<span className='font-bold text-[40px]'>
+									<span className='font-bold text-[32px]'>
 										{s.value}
 									</span>
 								</div>
@@ -152,20 +164,26 @@ export default function DashboardClient({ userEmail }: DashboardClientProps) {
 							<span className='font-bold'>Riwayat Kegiatan</span>
 						</div>
 						<div className='flex flex-col gap-4 font-medium'>
-							{activitiesHistory.map(a => (
+							{riwayatKegiatan.map(a => (
 								<div
-									key={a.name}
+									key={a.nama}
 									className='rounded-xl bg-white p-4 flex gap-8'>
 									<div className='h-full aspect-square bg-slate-400 rounded-md w-24'></div>
 									<div className='flex flex-col'>
 										<span className='flex items-center font-extrabold text-[#272e6e]'>
-											{a.name}
+											{a.nama}
 										</span>
 										<span className='flex items-center text-xs opacity-70'>
-											{a.date}
+											{new Date(
+												a.tanggal,
+											).toLocaleDateString('id-ID', {
+												day: 'numeric',
+												month: 'long',
+												year: 'numeric',
+											})}
 										</span>
 										<span className='mt-1 text-sm'>
-											{a.description}
+											{a.deskripsi}
 										</span>
 										<div className='mt-4 flex gap-4 items-center cursor-pointer hover:translate-x-1 transition-transform'>
 											<span className='underline font-light text-xs'>

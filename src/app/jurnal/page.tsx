@@ -24,7 +24,7 @@ export default function Jurnal() {
 	}, []);
 
 	return (
-		<div className='flex flex-col min-h-screen gap-8 p-4'>
+		<div className='flex flex-col min-h-screen gap-8'>
 			{/* Header */}
 			<div className='py-4 bg-white rounded-2xl px-4'>
 				<span className='font-black text-[32px]'>Jurnal Harian</span>
