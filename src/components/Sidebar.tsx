@@ -21,7 +21,7 @@ const menus = [
 	{
 		menu: 'Rekap Bulanan',
 		icon: <FaChartBar />,
-		link: '/dashboard/rekap',
+		link: '/rekap',
 	},
 ];
 
@@ -29,7 +29,7 @@ export default function Sidebar() {
 	const pathname = usePathname();
 
 	return (
-		<div className='w-70 bg-[#262e6d] py-8 flex flex-col h-full text-white font-bold shadow-2xl z-50'>
+		<div className='w-70 bg-[#262e6d] py-8 flex flex-col h-full text-white font-bold shadow-2xl z-50 print:hidden'>
 			<div className='w-full flex items-center justify-center px-6 mb-4'>
 				<Image src={logo} alt='Logo Notes Smangad' priority />
 			</div>
