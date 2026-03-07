@@ -2,7 +2,7 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import Sidebar from '@/components/Sidebar';
-import { Providers } from '@/components/Providers'; // Pastikan file ini sudah dibuat di src/components/Providers.tsx
+import { Providers } from '@/components/Providers';
 
 import { Nunito } from 'next/font/google';
 
@@ -26,7 +26,6 @@ export default function RootLayout({
             <body
                 className={`${nunito.className} flex w-full min-h-screen h-screen bg-[#262e6d]`}
             >
-                {/* Kita bungkus semua konten dengan Providers */}
                 <Providers>
                     <div className='fixed left-0 h-screen'>
                         <Sidebar />

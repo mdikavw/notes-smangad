@@ -7,7 +7,6 @@ export async function registerUser(formData: FormData) {
   const password = formData.get("password") as string;
 
   try {
-    // Hash password sebelum simpan ke MySQL
     const hashedPassword = await bcrypt.hash(password, 10);
     
     await prisma.user.create({
