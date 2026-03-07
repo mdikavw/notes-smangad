@@ -35,4 +35,4 @@ export async function registerUser(formData: FormData) {
     } catch (error) {
         return { error: "Terjadi kesalahan pada server." };
     }
-}
+} //
