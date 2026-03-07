@@ -1,6 +1,8 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation'; // Tambahkan ini
+import { tambahJurnal } from '@/app/actions/jurnal'; // Import Server Action kita
 
 interface PopupTambahKegiatanProps {
     isOpen: boolean;
@@ -12,6 +14,7 @@ export function PopupTambahKegiatan({
     onClose,
 }: PopupTambahKegiatanProps) {
     const [loading, setLoading] = useState(false);
+    const router = useRouter(); // Inisialisasi router
 
     if (!isOpen) return null;
 
@@ -19,12 +22,21 @@ export function PopupTambahKegiatan({
         e.preventDefault();
         setLoading(true);
         
-
+        // Bungkus data form
+        const formData = new FormData(e.currentTarget);
         
-        setTimeout(() => {
-            setLoading(false);
-            onClose(); 
-        }, 1000);
+        // Panggil server action ke MariaDB
+        const res = await tambahJurnal(formData);
+
+        if (res.success) {
+            alert("Jurnal berhasil disimpan!");
+            router.refresh(); // Refresh halaman agar data baru langsung muncul
+            onClose(); // Tutup popup
+        } else {
+            alert("Gagal menyimpan: " + res.error);
+        }
+
+        setLoading(false);
     };
 
     return (
@@ -43,8 +55,8 @@ export function PopupTambahKegiatan({
                     </button>
                 </div>
 
+                {/* --- FORM TETAP SAMA SEPERTI MILIKMU --- */}
                 <form onSubmit={handleSubmit} className="flex flex-col gap-5">
-                    
                     <div className="flex flex-col gap-1.5">
                         <label className="text-sm font-bold text-[#262e6d] ml-1">Tanggal Kegiatan</label>
                         <input
