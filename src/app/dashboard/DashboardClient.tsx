@@ -36,22 +36,18 @@ export default function DashboardClient({ userEmail, userName }: DashboardClient
     const [selected, setSelected] = useState<Date | undefined>();
     const [isPopupOpen, setIsPopupOpen] = useState(false);
 
-    const [stats, setStats] = useState<Stat[]>([]);
-    const [kegiatanHariIni, setKegiatanHariIni] = useState<Journal[]>([]);
-    const [riwayatKegiatan, setRiwayatKegiatan] = useState<Journal[]>([]);
+	const [stats, setStats] = useState<Stat[]>([]);
+	const [kegiatanHariIni, setKegiatanHariIni] = useState<Journal[]>([]);
+	const [riwayatKegiatan, setRiwayatKegiatan] = useState<Journal[]>([]);
 
-    // Logika penentuan nama yang tampil
-    const displayName = userName || (userEmail ? userEmail.split('@')[0] : 'Pengguna');
-    const initial = displayName.charAt(0).toUpperCase();
-
-    useEffect(() => {
-        async function fetchData() {
-            try {
-                const [statsRes, todayRes, recentRes] = await Promise.all([
-                    fetch('/api/journals/stats').then(res => res.json()),
-                    fetch('/api/journals/today').then(res => res.json()),
-                    fetch('/api/journals/recent').then(res => res.json()),
-                ]);
+	useEffect(() => {
+		async function fetchData() {
+			try {
+				const [statsRes, todayRes, recentRes] = await Promise.all([
+					fetch('/api/journals/stats').then(res => res.json()),
+					fetch('/api/journals/today').then(res => res.json()),
+					fetch('/api/journals/recent').then(res => res.json()),
+				]);
 
 				setStats([
 					{
@@ -86,37 +82,37 @@ export default function DashboardClient({ userEmail, userName }: DashboardClient
         fetchData();
     }, []);
 
-    return (
-        <div className='flex flex-col min-h-screen items-start justify-start gap-8 w-full'>
-            <div className='py-4 bg-white rounded-2xl p-4 w-full'>
-                <span className='font-black text-[32px]'>Dashboard</span>
-            </div>
-            <div className='w-full flex gap-8'>
-                {/* Left Side */}
-                <div className='w-full flex flex-col gap-8'>
-                    {/* Stats */}
-                    <div className='w-full flex items-center justify-between gap-8'>
-                        {stats.map(s => (
-                            <div
-                                key={s.name}
-                                className={`rounded-2xl bg-white w-full px-4 py-4 flex items-center justify-between gap-4 text-[#0d1026]`}>
-                                <div className='flex flex-col ps-4'>
-                                    <span className='text-sm'>{s.name}</span>
-                                    <span className='font-bold text-[32px]'>
-                                        {s.value}
-                                    </span>
-                                </div>
-                                <div
-                                    className='flex items-center justify-center rounded-2xl p-6 text-xl'
-                                    style={{
-                                        backgroundColor: s.color,
-                                        color: s.text_color,
-                                    }}>
-                                    {s.icon}
-                                </div>
-                            </div>
-                        ))}
-                    </div>
+	return (
+		<div className='flex flex-col min-h-screen items-start justify-start gap-8 w-full'>
+			<div className='py-4 bg-white rounded-2xl p-4 w-full'>
+				<span className='font-black text-[32px]'>Dashboard</span>
+			</div>
+			<div className='w-full flex gap-8'>
+				{/* Left Side */}
+				<div className='w-full flex flex-col gap-8'>
+					{/* Stats */}
+					<div className='w-full flex items-center justify-between gap-8'>
+						{stats.map(s => (
+							<div
+								key={s.name}
+								className={`rounded-2xl bg-white w-full px-4 py-4 flex items-center justify-between gap-4 text-[#0d1026]`}>
+								<div className='flex flex-col ps-4'>
+									<span className='text-sm'>{s.name}</span>
+									<span className='font-bold text-[32px]'>
+										{s.value}
+									</span>
+								</div>
+								<div
+									className='flex items-center justify-center rounded-2xl p-6 text-xl'
+									style={{
+										backgroundColor: s.color,
+										color: s.text_color,
+									}}>
+									{s.icon}
+								</div>
+							</div>
+						))}
+					</div>
 
 					{/* Activity Table */}
 					<div className='flex flex-col gap-4 rounded-2xl bg-white p-4 overflow-clip'>
