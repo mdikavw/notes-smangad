@@ -1,78 +1,27 @@
 'use client';
 import { FaEye, FaPlus } from 'react-icons/fa';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { PopupTambahKegiatan } from '@/components/InputPopup';
 
-interface JournalEntry {
+interface Journal {
+	id: number;
 	tanggal: string;
 	nama: string;
 	deskripsi: string;
+	imageUrl: string | null;
 }
 
 // Data dummy jurnal dengan atribut tanggal, nama, deskripsi
-const journalEntries: JournalEntry[] = [
-	{
-		tanggal: '7 Maret 2026',
-		nama: 'Mengajar Matematika Kelas VII',
-		deskripsi:
-			'Membahas materi pecahan dan persentase. Siswa aktif bertanya.',
-	},
-	{
-		tanggal: '6 Maret 2026',
-		nama: 'Rapat Koordinasi Guru',
-		deskripsi:
-			'Membahas persiapan ujian tengah semester dan pembagian tugas evaluasi.',
-	},
-	{
-		tanggal: '5 Maret 2026',
-		nama: 'Penyusunan RPP IPA',
-		deskripsi: 'Menyusun RPP untuk materi IPA semester genap.',
-	},
-	{
-		tanggal: '4 Maret 2026',
-		nama: 'Evaluasi Hasil Belajar Siswa',
-		deskripsi:
-			'Melakukan koreksi dan evaluasi terhadap tugas dan ulangan siswa.',
-	},
-	{
-		tanggal: '3 Maret 2026',
-		nama: 'Mengajar Bahasa Indonesia Kelas VIII',
-		deskripsi: 'Mengulas teks cerita pendek dan latihan menulis karangan.',
-	},
-	{
-		tanggal: '2 Maret 2026',
-		nama: 'Workshop Kurikulum',
-		deskripsi: 'Mengikuti workshop terkait implementasi kurikulum merdeka.',
-	},
-	{
-		tanggal: '1 Maret 2026',
-		nama: 'Penyusunan Soal Ulangan',
-		deskripsi:
-			'Membuat soal ulangan harian untuk mata pelajaran IPA dan Matematika.',
-	},
-	{
-		tanggal: '29 Februari 2026',
-		nama: 'Kegiatan Ekstrakurikuler',
-		deskripsi:
-			'Membimbing siswa dalam kegiatan ekstrakurikuler Pramuka dan olahraga.',
-	},
-	{
-		tanggal: '28 Februari 2026',
-		nama: 'Rapat Persiapan Laporan Nilai',
-		deskripsi:
-			'Koordinasi dengan guru mata pelajaran lain untuk persiapan raport.',
-	},
-	{
-		tanggal: '27 Februari 2026',
-		nama: 'Mengajar IPS Kelas IX',
-		deskripsi:
-			'Membahas materi sejarah Indonesia pada masa penjajahan Belanda.',
-	},
-];
 
 export default function Jurnal() {
-	const [entries, setEntries] = useState<JournalEntry[]>(journalEntries);
+	const [journals, setJournals] = useState<Journal[]>([]);
 	const [isPopupOpen, setIsPopupOpen] = useState(false);
+
+	useEffect(() => {
+		fetch('/api/journals')
+			.then(res => res.json())
+			.then(setJournals);
+	}, []);
 
 	return (
 		<div className='flex flex-col min-h-screen gap-8 p-4'>
@@ -104,11 +53,21 @@ export default function Jurnal() {
 						</tr>
 					</thead>
 					<tbody>
-						{entries.map((entry, idx) => (
+						{journals.map((entry, idx) => (
 							<tr
 								key={idx}
 								className='border-t border-gray-200 hover:bg-gray-50 transition'>
-								<td className='p-3'>{entry.tanggal}</td>
+								<td className='p-3'>
+									{' '}
+									{new Date(entry.tanggal).toLocaleDateString(
+										'id-ID',
+										{
+											day: 'numeric',
+											month: 'long',
+											year: 'numeric',
+										},
+									)}
+								</td>
 								<td className='p-3 font-medium text-[#272e6e]'>
 									{entry.nama}
 								</td>
