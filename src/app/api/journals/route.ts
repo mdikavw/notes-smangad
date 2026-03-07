@@ -1,20 +1,40 @@
-// app/api/journals/route.ts
-import { PrismaMariaDb } from '@prisma/adapter-mariadb';
-import { PrismaClient } from '@prisma/client';
-import 'dotenv/config';
+import { getServerSession } from 'next-auth';
+import { prisma } from '@/lib/prisma';
+import { authOptions } from '../auth/[...nextauth]/route'; // sesuaikan dengan setup NextAuth
 
-const adapter = new PrismaMariaDb({
-	host: process.env.DB_HOST,
-	user: process.env.DB_USER,
-	password: process.env.DB_PASSWORD,
-	database: process.env.DB_NAME,
-	port: Number(process.env.DB_PORT) || 3306,
-});
-const prisma = new PrismaClient({ adapter });
+export async function GET(req: Request) {
+	try {
+		const session = await getServerSession(authOptions);
+		if (!session?.user?.email) {
+			return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+				status: 401,
+			});
+		}
 
-export async function GET() {
-	const journals = await prisma.journal.findMany({
-		orderBy: { tanggal: 'desc' },
-	});
-	return new Response(JSON.stringify(journals), { status: 200 });
+		const email = session.user.email;
+
+		// Ambil user berdasarkan email
+		const user = await prisma.user.findUnique({
+			where: { email },
+			select: { id: true },
+		});
+
+		if (!user) {
+			return new Response(JSON.stringify({ error: 'User not found' }), {
+				status: 404,
+			});
+		}
+
+		const journals = await prisma.journal.findMany({
+			where: { userId: user.id },
+			orderBy: { tanggal: 'desc' },
+		});
+
+		return new Response(JSON.stringify(journals), { status: 200 });
+	} catch (error) {
+		console.error('Error fetching journals for current user:', error);
+		return new Response(JSON.stringify({ error: 'Server error' }), {
+			status: 500,
+		});
+	}
 }
