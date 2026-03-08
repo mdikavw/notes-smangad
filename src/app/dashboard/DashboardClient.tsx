@@ -9,10 +9,15 @@ import {
 } from 'react-icons/fa6';
 import 'react-day-picker/style.css';
 import { PopupTambahKegiatan } from '@/components/InputPopup';
+import { PopupViewKegiatan } from '@/components/ViewPopup';
+import { getUserProfile } from '../actions/user';
+import ProfileCard from '@/components/ProfileCard';
+import Link from 'next/link';
 
 // 1. Definisikan interface props agar tidak error di page.tsx
 interface DashboardClientProps {
 	userEmail?: string | null;
+	user?: any;
 }
 
 interface Journal {
@@ -32,9 +37,13 @@ interface Stat {
 }
 
 // 2. Ubah nama fungsi menjadi DashboardClient dan terima props userEmail
-export default function DashboardClient({ userEmail }: DashboardClientProps) {
+export default function DashboardClient({
+	userEmail,
+	user,
+}: DashboardClientProps) {
 	const [selected, setSelected] = useState<Date | undefined>();
 	const [isPopupOpen, setIsPopupOpen] = useState(false);
+	const [viewJournal, setViewJournal] = useState<Journal | null>(null);
 
 	const [stats, setStats] = useState<Stat[]>([]);
 	const [kegiatanHariIni, setKegiatanHariIni] = useState<Journal[]>([]);
@@ -43,16 +52,24 @@ export default function DashboardClient({ userEmail }: DashboardClientProps) {
 	useEffect(() => {
 		async function fetchData() {
 			try {
+				if (!userEmail) return;
+
 				const [statsRes, todayRes, recentRes] = await Promise.all([
-					fetch('/api/journals/stats').then(res => res.json()),
-					fetch('/api/journals/today').then(res => res.json()),
-					fetch('/api/journals/recent').then(res => res.json()),
+					fetch(`/api/journals/stats?email=${userEmail}`).then(res =>
+						res.json(),
+					),
+					fetch(`/api/journals/today?email=${userEmail}`).then(res =>
+						res.json(),
+					),
+					fetch(`/api/journals/recent?email=${userEmail}`).then(res =>
+						res.json(),
+					),
 				]);
 
 				setStats([
 					{
 						name: 'Kegiatan Hari Ini',
-						value: statsRes.kegiatanHariIni.toString(),
+						value: statsRes.kegiatanHariIni.length.toString(), // ✅ pakai .length
 						color: '#3d48ac',
 						icon: <FaBriefcase />,
 						text_color: '#fff',
@@ -82,10 +99,20 @@ export default function DashboardClient({ userEmail }: DashboardClientProps) {
 		fetchData();
 	}, []);
 
+	const handleView = (journal: Journal) => {
+		setViewJournal(journal);
+	};
+
 	return (
 		<div className='flex flex-col min-h-screen items-start justify-start gap-8 w-full'>
-			<div className='py-4 bg-white rounded-2xl p-4 w-full'>
+			<div className='py-4 bg-white rounded-2xl p-4 w-full flex justify-between items-center'>
 				<span className='font-black text-[32px]'>Dashboard</span>
+				<Link
+					href={'/profile'}
+					className='bg-slate-200 size-12 rounded-full flex items-center justify-center text-[#272e6e] font-bold text-lg uppercase'>
+					{' '}
+					{user?.name?.charAt(0) || 'U'}
+				</Link>
 			</div>
 			<div className='w-full flex gap-8'>
 				{/* Left Side */}
@@ -152,7 +179,11 @@ export default function DashboardClient({ userEmail }: DashboardClientProps) {
 												{entry.deskripsi}
 											</td>
 											<td className='text-center p-3 text-[#272e6e]'>
-												<button className='hover:text-blue-500 transition'>
+												<button
+													onClick={() =>
+														handleView(entry)
+													}
+													className='text-[#272e6e] hover:text-blue-500 transition'>
 													<FaEye />
 												</button>
 											</td>
@@ -220,23 +251,7 @@ export default function DashboardClient({ userEmail }: DashboardClientProps) {
 
 				{/* Right Side */}
 				<div className='min-w-66.5 flex flex-col gap-8 w-66.5'>
-					<div className='flex flex-col w-full h-fit bg-white rounded-2xl items-center justify-center gap-4 py-6 '>
-						<div className='bg-slate-200 size-25 rounded-full flex items-center justify-center text-[#272e6e] font-bold text-2xl uppercase'>
-							{userEmail?.charAt(0) || 'U'}
-						</div>
-						<div className='flex flex-col items-center justify-center'>
-							<span className='font-bold text-[18px] text-[#272e6e] text-center px-2'>
-								{userEmail?.split('@')[0] ||
-									'Suliono Albiantoro'}
-							</span>
-							<span className='text-[10px] text-slate-400 mt-1 uppercase tracking-widest'>
-								NIP: 19900315 201802 1 001
-							</span>
-						</div>
-						<span className='px-4 py-1 bg-[#ffc65c] text-[#272e6e] text-xs font-bold rounded-full'>
-							Pendidik / Pengajar
-						</span>
-					</div>
+					<ProfileCard user={user} />
 					<div className='bg-white rounded-2xl p-4 w-full'>
 						<DayPicker className='w-full' />
 					</div>
@@ -245,6 +260,11 @@ export default function DashboardClient({ userEmail }: DashboardClientProps) {
 			<PopupTambahKegiatan
 				isOpen={isPopupOpen}
 				onClose={() => setIsPopupOpen(false)}
+			/>
+			<PopupViewKegiatan
+				isOpen={!!viewJournal}
+				onClose={() => setViewJournal(null)}
+				journal={viewJournal || undefined}
 			/>
 		</div>
 	);

@@ -14,20 +14,9 @@ const prisma = new PrismaClient({ adapter });
 async function main() {
 	// 1. Cari atau buat User dummy terlebih dahulu
 	// Karena tabel Journal memiliki Foreign Key (userId) yang wajib diisi
-	let dummyUser = await prisma.user.findFirst({
-		where: { email: 'guru@smangad.com' },
+	let user = await prisma.user.findFirst({
+		where: { id: 2 },
 	});
-
-	if (!dummyUser) {
-		dummyUser = await prisma.user.create({
-			data: {
-				email: 'guru@smangad.com',
-				password: 'password123', // Hanya untuk testing
-				name: 'Guru Dummy',
-			},
-		});
-		console.log('👤 User dummy berhasil dibuat!');
-	}
 
 	const entries = [
 		{
@@ -171,7 +160,7 @@ async function main() {
 		await prisma.journal.create({
 			data: {
 				...entry,
-				userId: dummyUser.id, // Menyambungkan jurnal dengan user
+				userId: user.id, // Menyambungkan jurnal dengan user
 			},
 		});
 	}
