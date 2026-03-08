@@ -2,6 +2,7 @@
 import { FaEye, FaPlus, FaTrashAlt } from 'react-icons/fa';
 import { useEffect, useState } from 'react';
 import { PopupTambahKegiatan } from '@/components/InputPopup';
+import { PopupViewKegiatan } from '@/components/ViewPopup';
 
 interface Journal {
 	id: number;
@@ -16,12 +17,17 @@ interface Journal {
 export default function Jurnal() {
 	const [journals, setJournals] = useState<Journal[]>([]);
 	const [isPopupOpen, setIsPopupOpen] = useState(false);
+	const [viewJournal, setViewJournal] = useState<Journal | null>(null);
 
 	useEffect(() => {
 		fetch('/api/journals')
 			.then(res => res.json())
 			.then(setJournals);
 	}, []);
+
+	const handleView = (journal: Journal) => {
+		setViewJournal(journal);
+	};
 
 	const handleDelete = async (id: number) => {
 		if (!confirm('Apakah Anda yakin ingin menghapus jurnal ini?')) return;
@@ -96,7 +102,9 @@ export default function Jurnal() {
 										{entry.deskripsi}
 									</td>
 									<td className='text-center p-3'>
-										<button className='text-[#272e6e] hover:text-blue-500 transition'>
+										<button
+											onClick={() => handleView(entry)}
+											className='text-[#272e6e] hover:text-blue-500 transition'>
 											<FaEye />
 										</button>
 									</td>
@@ -126,6 +134,11 @@ export default function Jurnal() {
 			<PopupTambahKegiatan
 				isOpen={isPopupOpen}
 				onClose={() => setIsPopupOpen(false)}
+			/>
+			<PopupViewKegiatan
+				isOpen={!!viewJournal}
+				onClose={() => setViewJournal(null)}
+				journal={viewJournal || undefined}
 			/>
 		</div>
 	);
