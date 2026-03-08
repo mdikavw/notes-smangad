@@ -8,10 +8,8 @@ import { getJurnalByBulan } from "@/app/actions/rekap";
 import { useSession } from "next-auth/react";
 
 export default function RekapPage() {
-    // Mengambil data user yang sedang login (Nama & Email Asli)
     const { data: session } = useSession();
     
-    // Set default ke bulan saat ini (misal: "2026-03")
     const [selectedMonth, setSelectedMonth] = useState(() => {
         const now = new Date();
         return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
@@ -20,7 +18,6 @@ export default function RekapPage() {
     const [dbData, setDbData] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(true);
 
-    // Ambil data dari MariaDB setiap kali selectedMonth berubah
     useEffect(() => {
         const fetchDbData = async () => {
             setIsLoading(true);
@@ -37,7 +34,6 @@ export default function RekapPage() {
         fetchDbData();
     }, [selectedMonth]);
 
-    // Format YYYY-MM ke Teks Bulan (Kop PDF)
     const getFormattedMonth = (yyyymm: string) => {
         if (!yyyymm) return "-";
         const [year, month] = yyyymm.split("-");
@@ -45,7 +41,6 @@ export default function RekapPage() {
         return `${months[parseInt(month) - 1]} ${year}`;
     };
 
-    // Format Date DB ke Teks (Isi Jurnal) -> Contoh: "07 Maret 2026"
     const formatTanggal = (dateString: string | Date) => {
         const date = new Date(dateString);
         const day = String(date.getDate()).padStart(2, '0');
@@ -209,13 +204,22 @@ export default function RekapPage() {
                 </div>
 
                 {(!isLoading && dbData.length > 0) && (
-                    <div className="mt-16 flex justify-end print:break-inside-avoid text-[12pt]">
+                    <div className="mt-16 flex justify-between print:break-inside-avoid text-[12pt]">
+                        
+                        <div className="text-center w-64">
+                            <p>Pacitan, {formatTanggal(new Date())}</p>
+                            <p className="mb-20">Guru Mata Pelajaran</p>
+                            <p className="font-bold underline uppercase">{session?.user?.name || "NAMA GURU"}</p>
+                            <p>NIP. -</p>
+                        </div>
+
                         <div className="text-center w-64">
                             <p>Mengetahui,</p>
                             <p className="mb-20">Kepala Sekolah</p>
                             <p className="font-bold underline">Drs. Budi Suryanto, MM.Pd.</p>
-                            <p>NIP. -</p>
+                            <p>NIP. 196707151995121008</p>
                         </div>
+                        
                     </div>
                 )}
 
