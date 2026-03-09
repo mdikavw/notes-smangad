@@ -40,7 +40,14 @@ export async function getJurnalByBulan(bulanStr: string) {
             }
         });
 
-        return { success: true, data: journals };
+        return { 
+            success: true, 
+            data: journals,
+            user: {
+                nip: user.nip,
+                jabatan: user.position
+            }
+        };
     } catch (error) {
         console.error("Gagal mengambil data rekap:", error);
         return { success: false, error: "Terjadi kesalahan server" };
