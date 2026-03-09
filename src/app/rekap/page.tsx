@@ -16,7 +16,6 @@ export default function RekapPage() {
     });
 
     const [dbData, setDbData] = useState<any[]>([]);
-    // Tambahan state untuk menyimpan data NIP dan Jabatan dari DB
     const [userData, setUserData] = useState<any>(null); 
     const [isLoading, setIsLoading] = useState(true);
 
@@ -27,7 +26,7 @@ export default function RekapPage() {
             
             if (result.success) {
                 setDbData(result.data || []);
-                setUserData(result.user || null); // Menyimpan data user dari server action
+                setUserData(result.user || null);
             } else {
                 setDbData([]);
                 setUserData(null);
@@ -160,13 +159,11 @@ export default function RekapPage() {
                             <tr>
                                 <td className="py-0.5">NIP</td>
                                 <td className="py-0.5">:</td>
-                                {/* Jika db punya NIP tampilkan, jika tidak tampilkan "-" */}
                                 <td className="py-0.5">{userData?.nip || "-"}</td>
                             </tr>
                             <tr>
                                 <td className="py-0.5">Jabatan</td>
                                 <td className="py-0.5">:</td>
-                                {/* Mengambil jabatan dari DB atau fallback jika kosong */}
                                 <td className="py-0.5">{userData?.jabatan || "-"}</td>
                             </tr>
                         </tbody>
