@@ -16,6 +16,7 @@ export default function RekapPage() {
     });
 
     const [dbData, setDbData] = useState<any[]>([]);
+    const [userData, setUserData] = useState<any>(null); 
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
@@ -23,10 +24,12 @@ export default function RekapPage() {
             setIsLoading(true);
             const result = await getJurnalByBulan(selectedMonth);
             
-            if (result.success && result.data) {
-                setDbData(result.data);
+            if (result.success) {
+                setDbData(result.data || []);
+                setUserData(result.user || null);
             } else {
                 setDbData([]);
+                setUserData(null);
             }
             setIsLoading(false);
         };
@@ -154,14 +157,14 @@ export default function RekapPage() {
                                 <td className="py-0.5 font-bold uppercase">{session?.user?.name || "Nama Belum Diatur"}</td>
                             </tr>
                             <tr>
-                                <td className="py-0.5">Email / NIP</td>
+                                <td className="py-0.5">NIP</td>
                                 <td className="py-0.5">:</td>
-                                <td className="py-0.5">{session?.user?.email || "Email Belum Diatur"}</td>
+                                <td className="py-0.5">{userData?.nip || "-"}</td>
                             </tr>
                             <tr>
                                 <td className="py-0.5">Jabatan</td>
                                 <td className="py-0.5">:</td>
-                                <td className="py-0.5">Guru Mata Pelajaran</td>
+                                <td className="py-0.5">{userData?.jabatan || "-"}</td>
                             </tr>
                         </tbody>
                     </table>
@@ -210,7 +213,7 @@ export default function RekapPage() {
                             <p>Pacitan, {formatTanggal(new Date())}</p>
                             <p className="mb-20">Guru Mata Pelajaran</p>
                             <p className="font-bold underline uppercase">{session?.user?.name || "NAMA GURU"}</p>
-                            <p>NIP. -</p>
+                            <p>NIP. {userData?.nip || "-"}</p>
                         </div>
 
                         <div className="text-center w-64">
